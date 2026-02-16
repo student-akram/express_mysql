@@ -29,6 +29,13 @@ app.post("/users", (req, res) => {
     res.json({ message: "User added", id: result.insertId });
   });
 });
+// GET /users → Get all users
+app.get("/users", (req, res) => {
+  db.query("SELECT * FROM Users", (err, result) => {
+    if (err) return res.status(500).send(err);
+    res.json(result);
+  });
+});
 
 // ================= UPDATE =================
 app.put("/users/:id", (req, res) => {
@@ -72,5 +79,29 @@ app.delete("/users/:id", (req, res) => {
     res.json({ message: "User deleted" });
   });
 });
+// POST /buses → Add bus
+app.post("/buses", (req, res) => {
+  const { busNumber, totalSeats, availableSeats } = req.body;
 
+  const sql =
+    "INSERT INTO Buses (busNumber, totalSeats, availableSeats) VALUES (?, ?, ?)";
+
+  db.query(sql, [busNumber, totalSeats, availableSeats], (err) => {
+    if (err) return res.status(500).send(err);
+    res.send("Bus added!");
+  });
+});
+
+
+// GET /buses/available/:seats
+app.get("/buses/available/:seats", (req, res) => {
+  const seats = req.params.seats;
+
+  const sql = "SELECT * FROM Buses WHERE availableSeats > ?";
+
+  db.query(sql, [seats], (err, result) => {
+    if (err) return res.status(500).send(err);
+    res.json(result);
+  });
+});
 app.listen(3000, () => console.log("Server running on port 3000"));
